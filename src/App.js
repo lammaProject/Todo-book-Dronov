@@ -52,8 +52,8 @@ export default class App extends Component {
     this.setState((prev) => ({ data: newData }));
   }
 
-  async setDone(key) {
-    await setDone(this.state.currentUser, key);
+  async setDone(key, done) {
+    await setDone(this.state.currentUser, key, done);
     const deed = this.state.data.find((item) => item.key === key);
     this.setState({});
     deed.done ? (deed.done = false) : (deed.done = true);
@@ -138,10 +138,11 @@ export default class App extends Component {
               path="/"
               element={
                 <Todolist
+                  currentUser={this.state.currentUser}
                   list={this.state.data}
                   setDone={this.setDone}
                   delete={this.delete}
-                ></Todolist>
+                />
               }
             />
             <Route
@@ -155,7 +156,12 @@ export default class App extends Component {
             />
             <Route
               path="/:key"
-              element={<TodoDetail getDeed={this.getDeed} />}
+              element={
+                <TodoDetail
+                  getDeed={this.getDeed}
+                  currentUser={this.state.currentUser}
+                />
+              }
             />
             <Route
               path="/register"

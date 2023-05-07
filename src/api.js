@@ -5,7 +5,15 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 
-import { getDatabase, ref, push, set, get, query, remove } from "firebase/database";
+import {
+  getDatabase,
+  ref,
+  push,
+  set,
+  get,
+  query,
+  remove,
+} from "firebase/database";
 
 export async function register(email, password) {
   try {
@@ -38,10 +46,10 @@ export async function add(users, deed) {
   const oRef = await push(ref(getDatabase(), `users/${users.uid}/todos`));
   await set(oRef, deed);
   const oSnapshot = await get(query(oRef));
-  console.log(oSnapshot)
+  console.log(oSnapshot);
   const oDeed = oSnapshot.val();
   oDeed.key = oRef.key;
-  console.log(oDeed, 'oDeed')
+  console.log(oDeed, "oDeed");
   return oDeed;
 }
 
@@ -60,10 +68,17 @@ export async function getList(user) {
   return oArr;
 }
 
-export function setDone(user, key) {
-  return set(ref(getDatabase(), `users/${user.uid}/todos/${key}/done`), true);
+export function setDone(user, key, done) {
+  console.log(done, "SETDONE");
+  if (done) {
+    return set(
+      ref(getDatabase(), `users/${user.uid}/todos/${key}/done`),
+      false
+    );
+  } else
+    return set(ref(getDatabase(), `users/${user.uid}/todos/${key}/done`), true);
 }
 
 export function del(user, key) {
-  return remove(ref(getDatabase(), `users/${user.uid}/todos/${key}`))
+  return remove(ref(getDatabase(), `users/${user.uid}/todos/${key}`));
 }
