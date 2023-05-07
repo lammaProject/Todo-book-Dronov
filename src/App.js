@@ -6,32 +6,14 @@ import { HashRouter, Routes, Route, NavLink } from "react-router-dom";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import Register from "./Register";
 import { app } from "./firebase";
-
-const date1 = new Date(2021, 7, 19, 14, 5);
-const date2 = new Date(2021, 7, 19, 15, 23);
-
-const initialData = [
-  {
-    title: "Изучить React",
-    desc: "Да поскорее!",
-    image: "",
-    done: false,
-    createdAt: date1.toLocaleString(),
-    key: 0,
-  },
-  {
-    title: "Написать первое React-приложение",
-    desc: "Список запланированных дел",
-    image: "",
-    done: false,
-    key: date2.getTime(),
-  },
-];
+import Logout from "./Logout";
+import Login from "./Login";
+import { getList, setDone, del } from "./api";
 
 export default class App extends Component {
   constructor(props) {
     super(props);
-    this.state = { data: initialData, currentUser: null };
+    this.state = { data: [], currentUser: null };
     this.setDone = this.setDone.bind(this);
     this.delete = this.delete.bind(this);
     this.addDeal = this.addDeal.bind(this);
@@ -40,8 +22,14 @@ export default class App extends Component {
     this.authStateChanged = this.authStateChanged.bind(this);
   }
 
-  authStateChanged(user) {
+  async authStateChanged(user) {
     this.setState((state) => ({ currentUser: user }));
+    if (user) {
+      const newData = await getList(user);
+      this.setState((state) => ({ data: newData }));
+    } else {
+      this.setState((state) => ({ data: [] }));
+    }
   }
 
   componentDidMount() {
@@ -58,19 +46,20 @@ export default class App extends Component {
     this.setState((state) => ({}));
   }
 
-  delete(key) {
+  async delete(key) {
+    await del(this.state.currentUser, key);
     const newData = this.state.data.filter((current) => current.key !== key);
     this.setState((prev) => ({ data: newData }));
   }
 
-  setDone(key) {
+  async setDone(key) {
+    await setDone(this.state.currentUser, key);
     const deed = this.state.data.find((item) => item.key === key);
     this.setState({});
     deed.done ? (deed.done = false) : (deed.done = true);
   }
 
   getDeed(key) {
-    key = +key;
     return this.state.data.find((current) => current.key === key);
   }
 
@@ -120,15 +109,27 @@ export default class App extends Component {
               )}
               {!this.state.currentUser && (
                 <NavLink
-                  to="/register"
+                  to="/login"
                   className={({ isActive }) =>
                     "navbar-item" + (isActive ? "is-active" : "")
                   }
                 >
-                  Зарегистрироваться
+                  Войти
                 </NavLink>
               )}
             </div>
+            {this.state.currentUser && (
+              <div className="navbar-end">
+                <NavLink
+                  to="/logout"
+                  className={({ isActive }) =>
+                    "navbar-item" + (isActive ? "is-active" : "")
+                  }
+                >
+                  Выйти
+                </NavLink>
+              </div>
+            )}
           </div>
         </nav>
         <main className="content px-6 mt-6">
@@ -143,7 +144,15 @@ export default class App extends Component {
                 ></Todolist>
               }
             />
-            <Route path="/add" element={<TodoAdd add={this.addDeal} />} />
+            <Route
+              path="/add"
+              element={
+                <TodoAdd
+                  add={this.addDeal}
+                  currentUser={this.state.currentUser}
+                />
+              }
+            />
             <Route
               path="/:key"
               element={<TodoDetail getDeed={this.getDeed} />}
@@ -151,6 +160,14 @@ export default class App extends Component {
             <Route
               path="/register"
               element={<Register currentUser={this.state.currentUser} />}
+            />
+            <Route
+              path="/login"
+              element={<Login currentUser={this.state.currentUser} />}
+            />
+            <Route
+              path="/logout"
+              element={<Logout currentUser={this.state.currentUser} />}
             />
           </Routes>
         </main>

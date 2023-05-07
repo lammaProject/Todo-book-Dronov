@@ -1,6 +1,6 @@
 import { Component } from "react";
-import { Navigate } from "react-router-dom";
-import { register } from "./auth";
+import { NavLink, Navigate } from "react-router-dom";
+import { register } from "./api";
 
 export default class Register extends Component {
   constructor(props) {
@@ -74,6 +74,18 @@ export default class Register extends Component {
               </div>
             </div>
           </form>
+
+          <div className="field is-grouped is-grouped-right mt-2">
+        <div className="control">
+          <NavLink to="/login">
+            <input
+              type="reset"
+              className="button is-primary"
+              value="Войти"
+            />
+          </NavLink>
+        </div>
+      </div>
         </section>
       );
   }

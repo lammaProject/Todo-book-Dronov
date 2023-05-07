@@ -6,7 +6,8 @@ const firebaseConfig = {
   projectId: "todos-afbb3",
   storageBucket: "todos-afbb3.appspot.com",
   messagingSenderId: "1063579081397",
-  appId: "1:1063579081397:web:801ffd9e2813d944327cfc"
+  appId: "1:1063579081397:web:801ffd9e2813d944327cfc",
+  databaseURL: 'https://todos-afbb3-default-rtdb.europe-west1.firebasedatabase.app'
 };
 
 export const app = initializeApp(firebaseConfig);
